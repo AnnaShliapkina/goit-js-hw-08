@@ -5,21 +5,14 @@ const LOCALSTORAGE_KEY = 'videoplayer-current-time';
 const iframe = document.querySelector('iframe');
 const player = new Vimeo(iframe);
 
-player.on('timeupdate', throttle(clickOnStop, 1000));
-player.on('ended', ended);
+player.on(
+  'timeupdate',
+  throttle(function (value) {
+    localStorage.setItem(LOCALSTORAGE_KEY, value.seconds);
+    console.log(LOCALSTORAGE_KEY);
+  }, 1000)
+);
 
-function clickOnStop({ seconds }) {
-  const currentTimeValue = JSON.stringify(seconds);
-  localStorage.setItem(LOCALSTORAGE_KEY, currentTimeValue);
+if (localStorage.getItem(LOCALSTORAGE_KEY)) {
+  player.setCurrentTime(localStorage.getItem(LOCALSTORAGE_KEY));
 }
-
-function ended() {
-  player.setCurrentTime(0).then(function () {});
-}
-
-const playFromStop = function () {
-  const getSavedTime = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY));
-  player.setCurrentTime(getSavedTime).then(function () {});
-};
-
-playFromStop();
